@@ -74,9 +74,10 @@ function Game(ctx) {
 	function debugText() {
 		self.ctx.font = "20px Arial";
 		self.ctx.textAlign = 'left';
+		self.ctx.fillStyle = '#fff';
 		// Speed
-		self.ctx.fillText('x: ' + Math.abs(Math.round(player.vel.x)), 10, 30);
-		self.ctx.fillText('y: ' + Math.abs(Math.round(player.vel.y)), 10, 60);
+		self.ctx.fillText('x: ' + Math.round(player.x), 10, 30);
+		self.ctx.fillText('y: ' + Math.round(player.y), 10, 60);
 		self.ctx.fillText('v: ' + Math.abs(Math.round(player.vel.length())), 10, 90);
 
 		self.ctx.textAlign = 'center';

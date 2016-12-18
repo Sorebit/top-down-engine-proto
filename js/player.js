@@ -36,7 +36,7 @@ function Player(ctx, x, y, w, h) {
 	this.draw = function() {
 		self.ctx.beginPath();
 		self.ctx.rect(self.x - self.width / 2, self.y - self.height / 2, self.width, self.height);
-		self.ctx.fillStyle = '#fff';
+		self.ctx.fillStyle = '#e0e0e0';
 		self.ctx.fill();
 		self.ctx.closePath();
 	}
@@ -63,9 +63,8 @@ function Player(ctx, x, y, w, h) {
 		else
 			self.vel = self.vel.multiply(0);
 		
-		var f = self.vel.copy();
 		// Multiply forces by delta time to run smooth
-		f = f.multiply(dt/1000);
+		var f = self.vel.multiply(dt / 1000);
 		self.x += f.x;
 		self.y += f.y;
 
