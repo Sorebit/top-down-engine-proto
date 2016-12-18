@@ -1,8 +1,8 @@
+'use strict';
+
 function Vector(x, y) {
 	this.x = x;
 	this.y = y;
-
-	var self = this;
 
 	this.add = function(v) {
 		this.x += v.x;
@@ -42,6 +42,8 @@ function Vector(x, y) {
 		}
 		return r;
 	}
+	this.copy = function() {
+		var r = new Vector(this.x, this.y);
+		return r;
+	}
 }
-
-
