@@ -20,9 +20,9 @@ function Player(ctx, x, y, w, h) {
 	var minVel = 5;
 	var maxVel = 400;
 	// Friction (should be less than acceleration)
-	var fri = 800;
+	var fri = 1000;
 	// Acceleration
-	var acc = 100;
+	var acc = 8000;
 
 	var self = this;
 
@@ -54,7 +54,8 @@ function Player(ctx, x, y, w, h) {
 		if(self.moving_left && !self.moving_right)
 			af.add(new Vector(-acc, 0));
 
-		af = af.scale(acc);
+		// I'm not sure if I should scale every force
+		af = af.scale(acc * dt / 1000);
 		self.addForce(af);
 
 		// Deceleration from friction
