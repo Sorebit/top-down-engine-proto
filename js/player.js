@@ -13,14 +13,14 @@ function Player(ctx, x, y, w, h) {
 	// A unit of time is a second - [s]
 	// A unit of distance is a pixel - [px]
 	// Velocity is measured in pixels per second [px / s]
-	// Acceleration is measured in pixels per squqre second [px / s^2]
+	// Acceleration / friction is measured in pixels per square second [px / s^2]
 
 	// Min / max velocity
 	// Minimum velocity exists to prevent calculation of negligible forces
 	var minVel = 5;
 	var maxVel = 400;
 	// Friction (should be less than acceleration)
-	var fri = 40;
+	var fri = 800;
 	// Acceleration
 	var acc = 100;
 
@@ -58,8 +58,9 @@ function Player(ctx, x, y, w, h) {
 		self.addForce(af);
 
 		// Deceleration from friction
-		if(self.vel.length() > self.vel.scale(fri).length())
-			self.vel.sub(self.vel.scale(fri));
+		var ff = self.vel.scale(fri).multiply(dt / 1000);
+		if(self.vel.length() > ff.length())
+			self.vel.sub(ff);
 		else
 			self.vel = self.vel.multiply(0);
 		
