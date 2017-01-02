@@ -9,6 +9,8 @@ window.onresize = handleWindowResize;
 function handleWindowResize() {
 	can.width = window.innerWidth;
 	can.height = window.innerHeight;
+	debugCanvas.width = window.innerWidth;
+	debugCanvas.height = window.innerHeight;
 }
 handleWindowResize();
 

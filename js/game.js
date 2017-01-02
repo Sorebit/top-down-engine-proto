@@ -39,18 +39,30 @@ function Game(ctx) {
 	var lastTime = Date.now();
 	var deltaTime;
 
-	var player = new Player(ctx, 100, 100, 40, 40);
+	var player = new Player(ctx, 120, 120, 40, 40);
+	var entities = [];
+	entities.push(new Box(ctx, 300, 200, 60, 60));
+	entities.push(new Box(ctx, 270, 270, 120, 120));
+	entities.push(new Box(ctx, 210, 180, 80, 80));
+	entities.push(new Box(ctx, 210, 90, 80, 80));
+	entities.push(new Box(ctx, 480, 150, 2, 200));
+	entities.push(new Box(ctx, 480, 150, 200, 2));
 
 	// Render
 	this.draw = function() {
 		self.ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
+		for(var i in entities) {
+			entities[i].draw();
+		}
+
 		player.draw();
+		// Debug
 		debugText();
 	}
 
 	// Physics update
 	this.update = function(dt) {
-		player.update(dt);
+		player.update(dt, entities);
 	}
 
 	// Main loop
@@ -76,8 +88,8 @@ function Game(ctx) {
 		self.ctx.textAlign = 'left';
 		self.ctx.fillStyle = '#fff';
 		// Speed
-		self.ctx.fillText('x: ' + Math.round(player.x), 10, 30);
-		self.ctx.fillText('y: ' + Math.round(player.y), 10, 60);
+		self.ctx.fillText('x: ' + Math.round(player.pos.x), 10, 30);
+		self.ctx.fillText('y: ' + Math.round(player.pos.y), 10, 60);
 		self.ctx.fillText('v: ' + Math.abs(Math.round(player.vel.length())), 10, 90);
 
 		self.ctx.textAlign = 'center';
