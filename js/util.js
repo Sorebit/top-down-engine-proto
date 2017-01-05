@@ -63,9 +63,11 @@ function Vector(x, y) {
 // Static rectangle collision check
 // Returns true when boxes overlap
 function AABBCheck(a, b) {
-	return !(a.pos.x + a.width < b.pos.x || a.pos.x > b.pos.x + b.width || a.pos.y + a.height < b.pos.y || a.pos.y > b.pos.y + b.height);
+	return !(a.pos.x + a.width <= b.pos.x || a.pos.x >= b.pos.x + b.width || a.pos.y + a.height <= b.pos.y || a.pos.y >= b.pos.y + b.height);
 }
 
+// Static rectangle collision
+// Returns closest position where the collision happens
 function AABB(b1, b2) {
 	var moveX = 0.0;
 	var moveY = 0.0;
@@ -100,16 +102,19 @@ function AABB(b1, b2) {
 
 }
 
+// Broadphase box
+// Returns a box spanning box b from starting position
+// to position after moving it by velocity vel
 function broadphaseBox(b, vel)
 {
-    var box = new Box(0.0, 0.0, 0.0, 0.0);
+	var box = new Box(0.0, 0.0, 0.0, 0.0);
 
-    box.pos.x = vel.x > 0 ? b.pos.x : b.pos.x + vel.x;
-    box.pos.y = vel.y > 0 ? b.pos.y : b.pos.y + vel.y;
-    box.width = vel.x > 0 ? vel.x + b.width : b.width - vel.x;
-    box.height = vel.y > 0 ? vel.y + b.height : b.height - vel.y;
+	box.pos.x = vel.x > 0 ? b.pos.x : b.pos.x + vel.x;
+	box.pos.y = vel.y > 0 ? b.pos.y : b.pos.y + vel.y;
+	box.width = vel.x > 0 ? vel.x + b.width : b.width - vel.x;
+	box.height = vel.y > 0 ? vel.y + b.height : b.height - vel.y;
 
-    return box;
+	return box;
 }
 
 // Collision detection on moving box b1 and static box b2
@@ -117,42 +122,24 @@ function broadphaseBox(b, vel)
 // returns the time that the collision occured (where 0 is the start of the movement and 1 is the destination)
 // normalx and normaly return the normal of the collided surface (this can be used to do a response)
 
-var debugCanvas = document.getElementById('debug-canvas'); // __debug
-var debugctx = debugCanvas.getContext('2d'); // __debug
-
 function SweptAABB(b1, b2, vel, debctx)
 {
 	var xInvEntry, yInvEntry;
 	var xInvExit, yInvExit;
 
-	if(debctx) {
-		debctx.beginPath(); // __debug
-		debctx.moveTo(b1.pos.x, b1.pos.y); // __debug
-		debctx.lineTo(b1.pos.x + vel.x, b1.pos.y + vel.y); // __debug
-		debctx.strokeStyle = "#ff00ff"; // __debug
-		debctx.stroke(); // __debug
-		debctx.closePath(); // __debug
-	}
-
 	// find the distance between the objects on the near and far sides for both x and y
-	if(vel.x >= 0.0)
-	{
+	if(vel.x >= 0.0) {
 		xInvEntry = b2.pos.x - (b1.pos.x + b1.width);
 		xInvExit = (b2.pos.x + b2.width) - b1.pos.x;
-	}
-	else 
-	{
+	} else {
 		xInvEntry = (b2.pos.x + b2.width) - b1.pos.x;
 		xInvExit = b2.pos.x - (b1.pos.x + b1.width);
 	}
 
-	if(vel.y >= 0.0)
-	{
+	if(vel.y >= 0.0) {
 		yInvEntry = b2.pos.y - (b1.pos.y + b1.height);
 		yInvExit = (b2.pos.y + b2.height) - b1.pos.y;
-	}
-	else
-	{
+	} else {
 		yInvEntry = (b2.pos.y + b2.height) - b1.pos.y;
 		yInvExit = b2.pos.y - (b1.pos.y + b1.height);
 	}
@@ -161,88 +148,57 @@ function SweptAABB(b1, b2, vel, debctx)
 	var xEntry, yEntry;
 	var xExit, yExit;
 
-	if (vel.x == 0.0)
-	{
+	if (vel.x == 0.0) {
 		xEntry = -Infinity;
 		xExit = Infinity;
-	}
-	else
-	{
+	} else {
 		xEntry = xInvEntry / vel.x;
 		xExit = xInvExit / vel.x;
 	}
 
-	if (vel.y == 0.0)
-	{
+	if (vel.y == 0.0) {
 		yEntry = -Infinity;
 		yExit = Infinity;
-	}
-	else
-	{
+	} else {
 		yEntry = yInvEntry / vel.y;
 		yExit = yInvExit / vel.y;
 	}
 	
-	// find the earliest/latest times of collision
+	// Find the earliest/latest times of collision
 	var entryTime = Math.max(xEntry, yEntry);
 	var exitTime = Math.min(xExit, yExit);
 	
-	// if there was no collision
+	// If there was no collision
 	var normalx, normaly;
-	if (entryTime > exitTime || xEntry < 0.0 && yEntry < 0.0 || xEntry > 1.0 || yEntry > 1.0)
-	{
+	if (entryTime > exitTime || xEntry < 0.0 && yEntry < 0.0 || xEntry > 1.0 || yEntry > 1.0) {
 		normalx = 0.0;
 		normaly = 0.0;
 		return {
 			entryTime: 1.0
 		}
-	}
-	else // if there was a collision
-	{        		
-		// calculate normal of collided surface
-		if (xEntry > yEntry)
-		{
-			if (xInvEntry < 0.0)
-			{
+	} else {
+		// If there was a collision 
+		// Calculate normal of collided surface
+		if (xEntry > yEntry) {
+			if (xInvEntry < 0.0) {
 				normalx = 1.0;
 				normaly = 0.0;
-			}
-			else
-			{
+			} else {
 				normalx = -1.0;
 				normaly = 0.0;
 			}
 		}
-		else
-		{
-			if (yInvEntry < 0.0)
-			{
+		else {
+			if (yInvEntry < 0.0) {
 				normalx = 0.0;
 				normaly = 1.0;
-			}
-			else
-			{
+			} else {
 				normalx = 0.0;
 				normaly = -1.0;
 			}
 		}
 
-		// return the time of collision and normal	
-		if(debctx) {		
-			// debctx.clearRect(0, 0, debugCanvas.width, debugCanvas.height);
-			debctx.beginPath(); // __debug
-			debctx.rect(b1.pos.x + vel.x * entryTime, b1.pos.y + vel.y * entryTime, b1.width, b1.height); // __debug
-			debctx.lineTo(b1.pos.x + vel.x, b1.pos.y + vel.y); // __debug
-			debctx.strokeStyle = "#ff00ff"; // __debug
-			debctx.stroke(); // __debug
-			debctx.rect(b2.pos.x, b2.pos.y, b2.width, b2.height); // __debug
-			debctx.strokeStyle = "#00ff00"; // __debug
-			debctx.stroke(); // __debug
-			debctx.closePath(); // __debug
-
-			debctx.beginPath(); // __debug
-		}
-
+		// return the time of collision and normal
 		return {
 			entryTime: entryTime,
 			normalx: normalx,

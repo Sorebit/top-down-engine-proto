@@ -19,10 +19,10 @@ function Player(ctx, x, y, width, height) {
 
 	// Min / max velocity
 	// Minimum velocity exists to prevent calculation of negligible forces
-	var minVel = 5;
+	var minVel = 2;
 	var maxVel = 500;
 	// Friction (should be less than acceleration)
-	var fri = 2000;
+	var fri = 3000;
 	// Acceleration
 	var acc = 8000;
 
@@ -42,12 +42,6 @@ function Player(ctx, x, y, width, height) {
 		self.ctx.fill();
 		self.ctx.closePath();
 
-		// self.ctx.beginPath(); // __debug
-		// self.ctx.rect(self.pos.x, self.pos.y, 4, 4); // __debug
-		// self.ctx.rect(self.pos.x + self.width - 4, self.pos.y + self.height - 4, 4, 4); // __debug
-		// self.ctx.fillStyle = '#ff0000'; // __debug
-		// self.ctx.fill(); // __debug
-		// self.ctx.closePath(); // __debug
 	}
 
 	// Update forces and position (deltaTime in ms)
@@ -78,13 +72,16 @@ function Player(ctx, x, y, width, height) {
 		var mulVel = self.vel.multiply(dt / 1000);
 		var finalVel = mulVel;
 
-		// 
+		// First colision 
 		var firstCol = {
 			entryTime: Infinity,
 			normalx: 0,
 			normaly: 0
 		}
+		// Broadphase box to not check objects you can't possibly collide at this frame 
 		var bfb = broadphaseBox(self, finalVel);
+
+		// Find a collision that occurs first
 		for(var i in entityList) {
 			if(!AABBCheck(bfb, entityList[i])) {
 				continue;
@@ -96,29 +93,30 @@ function Player(ctx, x, y, width, height) {
 			}
 		}
 
+		// If any collision occured
 		if(firstCol.entryTime != Infinity)
 			finalVel = finalVel.multiply(firstCol.entryTime);
 
-		// console.log(finalVel);
-
+		// New position and dot product vector for sliding
 		var x = self.pos.x + finalVel.x;
 		var y = self.pos.y + finalVel.y;
 		var remainingtime = 1.0 - firstCol.entryTime;
 		var dotprod = (mulVel.x * firstCol.normaly + mulVel.y * firstCol.normalx) * remainingtime;
 		var nv = new Vector(dotprod * firstCol.normaly, dotprod * firstCol.normalx);
 
+		// Second collision
 		if(firstCol.entryTime != Infinity && (firstCol.normalx || firstCol.normaly)) {
-			// console.log('nv: ', nv); // __debug
-			// console.log('normalx: ', firstCol.normalx); // __debug
-			// console.log('normaly: ', firstCol.normaly); // __debug
 			var temp = new Box(self.ctx, self.pos.x + finalVel.x, self.pos.y + finalVel.y, self.width, self.height);
 			
+			// Broadphase box to not check objects you can't possibly collide at this frame 
 			var bfb = broadphaseBox(temp, nv);
+
 			var secondCol = {
 				entryTime: Infinity,
 				normaly: 0,
 				normalx: 0
 			}
+
 			for(var i in entityList) {
 				if(i == firstCol.id) {
 					continue
@@ -128,18 +126,14 @@ function Player(ctx, x, y, width, height) {
 				}
 				var scol = SweptAABB(temp, entityList[i], nv);
 				if(scol.entryTime < 1.0 && ((firstCol.normalx && scol.normaly) || (firstCol.normaly && scol.normalx)) ){
-					// debugctx.beginPath(); // __debug
-					// debugctx.rect(entityList[i].pos.x, entityList[i].pos.y, entityList[i].width, entityList[i].height); // __debug
-					// debugctx.strokeStyle = "#ffff00"; // __debug
-					// debugctx.stroke(); // __debug
-					// debugctx.closePath(); // __debug
 					if(scol.entryTime < secondCol.entryTime) {
 						secondCol = scol;
 						scol.id = i;
 					}
 				}
-
 			}
+
+			// Calcute final velocity
 			if(firstCol.entryTime != Infinity) {
 				finalVel = finalVel.multiply(firstCol.entryTime);
 			}
@@ -150,6 +144,7 @@ function Player(ctx, x, y, width, height) {
 			finalVel.add(nv);
 		}
 
+		// New position
 		var npos = {
 			x: self.pos.x + finalVel.x,
 			y: self.pos.y + finalVel.y,

@@ -3,9 +3,10 @@ It's soon to be a top down shooter
 
 ### Features
 - Basic controls and physics (acceleration, velocity, friction)
+- Collision (static and moving rectangles)
 
 ### Future features
-- Collision (moving rectangles, circles, points and lines)
+- Collision (circles, points and lines)
 - Weapon system (configurable
 	- Patterns and shapes
 	- Bullets, rockets etc.

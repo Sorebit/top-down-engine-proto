@@ -7,17 +7,17 @@ body {
 	overflow: hidden;
 }
 
+canvas {
+	position: absolute;
+	left: 0;
+	top: 0;
+}
+
 #game {
 	background: #000;
 	z-index: 1;
-	position:absolute;
-    left:0px;
-    top:0px;
 }
 
 #debug-canvas {
 	z-index: 2;
-	position:absolute;
-    left:0px;
-    top:0px;
 }
