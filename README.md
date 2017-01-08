@@ -4,9 +4,9 @@ It's soon to be a top down shooter
 ### Features
 - Basic controls and physics (acceleration, velocity, friction)
 - Collision (static and moving rectangles)
+- Camera (lerping with player's velocity) and aiming (affects camera a bit)
 
 ### Future features (sorted by priority)
-- Camera (lerping with player's velocity) and aiming (affects camera a bit)
 - Collision (circles, points and lines)
 	- Quadtree
 - Weapon system (configurable)

@@ -6,19 +6,25 @@ function Vector(x, y) {
 	this.x = x;
 	this.y = y;
 
-	// Add vector v
+	var self = this;
+
+	// Add vector (v)
 	this.add = function(v) {
-		this.x += v.x;
-		this.y += v.y;
+		var r = new Vector(this.x, this.y);
+		r.x += v.x;
+		r.y += v.y;
+		return r;
 	}
 
-	// Subtract vector v
+	// Subtract vector (v)
 	this.sub = function(v) {
-		this.x -= v.x;
-		this.y -= v.y;
+		var r = new Vector(this.x, this.y);
+		r.x -= v.x;
+		r.y -= v.y;
+		return r;
 	}
 
-	// Muliplies the vector by d
+	// Muliplies the vector by (d)
 	this.multiply = function(d) {
 		var r = new Vector(this.x, this.y);
 		r.x *= d;
@@ -26,12 +32,12 @@ function Vector(x, y) {
 		return r;
 	}
 
-	// Returns length of vector
+	// Returns length of (this)
 	this.length = function() {
 		return Math.sqrt(this.x * this.x + this.y * this.y);
 	}
 
-	// Scales a vector to length d
+	// Scales a vector to length (d)
 	this.scale = function(d) {
 		var r = new Vector(this.x, this.y);
 		var l = r.length();
@@ -41,7 +47,7 @@ function Vector(x, y) {
 		return r;
 	}
 
-	// Limits vector's length to d
+	// Limits vector's length to (d)
 	this.limit = function(d) {
 		var r = new Vector(this.x, this.y);
 		var l = r.length();
@@ -51,12 +57,18 @@ function Vector(x, y) {
 		return r;
 	}
 
-	// Returns a copy of this
+	// Linear interpolation from (this) to (other) in time (t)
+	this.lerp = function(other, t) {
+		var d = other.sub(this);
+		return this.add(d.multiply(t));
+	}
+
+	// Returns a copy of (this)
 	this.copy = function() {
 		return new Vector(this.x, this.y);
 	}
-}
 
+}
 
 /* Collision */
 
@@ -204,5 +216,15 @@ function SweptAABB(b1, b2, vel, debctx)
 			normalx: normalx,
 			normaly: normaly
 		}
+	}
+}
+
+/* Utility functions */
+var Util = {
+	map: function(a, b, l, r, val) {
+		if(b <= a || r <= l)
+			return null;
+		return (val - a) * (r - l) / (b - a) + l;
+		
 	}
 }

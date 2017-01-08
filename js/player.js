@@ -2,46 +2,27 @@
 
 function Player(ctx, x, y, width, height) {
 	this.ctx = ctx;
-	this.pos = {
-		x: x,
-		y, y
-	};
+	this.pos = new Vector(x, y);
 	this.width  = width;
 	this.height = height;
 
 	this.vel = new Vector(0, 0);
-
-	// Constants are not part of player objects
-	// A unit of time is a second - [s]
-	// A unit of distance is a pixel - [px]
-	// Velocity is measured in pixels per second [px / s]
-	// Acceleration / friction is measured in pixels per square second [px / s^2]
-
-	// Min / max velocity
-	// Minimum velocity exists to prevent calculation of negligible forces
-	var minVel = 2;
-	var maxVel = 500;
-	// Friction (should be less than acceleration)
-	var fri = 3000;
-	// Acceleration
-	var acc = 8000;
 
 	var self = this;
 
 	// Apply force (Vector(x, y))
 	this.addForce = function(v) {
 		if(v.length() > 0)
-			self.vel.add(v);
+			self.vel = self.vel.add(v);
 	}
 
 	// Render
-	this.draw = function(debug_flag) {
+	this.draw = function(offset) {
 		self.ctx.beginPath();
-		self.ctx.rect(self.pos.x, self.pos.y, self.width, self.height);
-		self.ctx.fillStyle = debug_flag ? 'rgba(255, 100, 100, 0.7)' : 'rgba(255, 255, 255, 0.7)';
+		self.ctx.rect(self.pos.x - offset.x, self.pos.y  - offset.y, self.width, self.height);
+		self.ctx.fillStyle = 'rgba(255, 255, 255, 0.7)';
 		self.ctx.fill();
 		self.ctx.closePath();
-
 	}
 
 	// Update forces and position (deltaTime in ms)
@@ -49,22 +30,22 @@ function Player(ctx, x, y, width, height) {
 		// Force to apply (should not be greater when moving diagonally)
 		var accelerationForce = new Vector(0, 0);
 		if(self.moving_up && !self.moving_down)
-			accelerationForce.add(new Vector(0, -acc));
+			accelerationForce = accelerationForce.add(new Vector(0, -ACCEL));
 		if(self.moving_down && !self.moving_up)
-			accelerationForce.add(new Vector(0, acc));
+			accelerationForce = accelerationForce.add(new Vector(0, ACCEL));
 		if(self.moving_right && !self.moving_left)
-			accelerationForce.add(new Vector(acc, 0));
+			accelerationForce = accelerationForce.add(new Vector(ACCEL, 0));
 		if(self.moving_left && !self.moving_right)
-			accelerationForce.add(new Vector(-acc, 0));
+			accelerationForce = accelerationForce.add(new Vector(-ACCEL, 0));
 
 		// I'm not sure if I should scale every force
-		accelerationForce = accelerationForce.scale(acc * dt / 1000);
+		accelerationForce = accelerationForce.scale(ACCEL * dt / 1000);
 		self.addForce(accelerationForce);
 
 		// Deceleration from friction
-		var frictionForce = self.vel.scale(fri).multiply(dt / 1000);
+		var frictionForce = self.vel.scale(FRICTION).multiply(dt / 1000);
 		if(self.vel.length() > frictionForce.length())
-			self.vel.sub(frictionForce);
+			self.vel = self.vel.sub(frictionForce);
 		else
 			self.vel = self.vel.multiply(0);
 		
@@ -141,7 +122,7 @@ function Player(ctx, x, y, width, height) {
 				nv = nv.multiply(secondCol.entryTime);
 			}
 
-			finalVel.add(nv);
+			finalVel = finalVel.add(nv);
 		}
 
 		// New position
@@ -153,9 +134,9 @@ function Player(ctx, x, y, width, height) {
 		self.pos = npos;
 
 		// Don't calcute negligible forces
-		if(self.vel.length() < minVel)
+		if(self.vel.length() < MINVEL)
 			self.vel = new Vector(0, 0);
 
-		self.vel = self.vel.limit(maxVel);
+		self.vel = self.vel.limit(MAXVEL);
 	}
 }
