@@ -134,7 +134,7 @@ function broadphaseBox(b, vel)
 // returns the time that the collision occured (where 0 is the start of the movement and 1 is the destination)
 // normalx and normaly return the normal of the collided surface (this can be used to do a response)
 
-function SweptAABB(b1, b2, vel, debctx)
+function SweptAABB(b1, b2, vel)
 {
 	var xInvEntry, yInvEntry;
 	var xInvExit, yInvExit;
@@ -185,9 +185,7 @@ function SweptAABB(b1, b2, vel, debctx)
 	if (entryTime > exitTime || xEntry < 0.0 && yEntry < 0.0 || xEntry > 1.0 || yEntry > 1.0) {
 		normalx = 0.0;
 		normaly = 0.0;
-		return {
-			entryTime: 1.0
-		}
+		entryTime = 1.0
 	} else {
 		// If there was a collision 
 		// Calculate normal of collided surface
@@ -199,8 +197,7 @@ function SweptAABB(b1, b2, vel, debctx)
 				normalx = -1.0;
 				normaly = 0.0;
 			}
-		}
-		else {
+		} else {
 			if (yInvEntry < 0.0) {
 				normalx = 0.0;
 				normaly = 1.0;
@@ -210,12 +207,12 @@ function SweptAABB(b1, b2, vel, debctx)
 			}
 		}
 
-		// return the time of collision and normal
-		return {
-			entryTime: entryTime,
-			normalx: normalx,
-			normaly: normaly
-		}
+	}
+	// return the time of collision and normal
+	return {
+		entryTime: entryTime,
+		normalx: normalx,
+		normaly: normaly
 	}
 }
 

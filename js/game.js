@@ -15,7 +15,7 @@ const FRICTION = 3000;
 // Acceleration
 const ACCEL = 8000;
 // Used for shiftng the camera depending on mouse position
-const MOUSEREACH = 100;
+const MOUSEREACH = 150;
 // "Smoothness" of camera
 const CAMERALERP = 0.3;
 
@@ -121,14 +121,36 @@ function Game(ctx) {
 	var lastTime = Date.now();
 	var deltaTime;
 
-	var player = new Player(ctx, 120, 120, 40, 40);
+	// Reason for 39.9 in ../NOTES.md
+	var player = new Player(ctx, 488, 488, 39.9, 39.9);
+
 	var entities = [];
-	entities.push(new Box(ctx, 300, 200, 60, 60));
-	entities.push(new Box(ctx, 270, 270, 120, 120));
-	entities.push(new Box(ctx, 210, 180, 80, 80));
-	entities.push(new Box(ctx, 210, 90, 80, 80));
-	entities.push(new Box(ctx, 480, 150, 2, 200));
-	entities.push(new Box(ctx, 480, 150, 200, 2));
+	// Test entities
+	for(var y = 0; y < 10; y++) {
+		for(var x = 0; x < 10; x++) {
+			if(x === 0 || y === 0 || x === 9 || y === 9) {
+				entities.push(new Box(ctx, x * 100, y * 100, 90, 90));
+			}
+		}
+	}
+
+	// Test map
+	var b = [
+		{x: 130, y: 130}, {x: 800, y: 130}, {x: 130, y: 800}, {x: 800, y: 800},
+		{x: 130, y: 530}, {x: 800, y: 530}, {x: 130, y: 400}, {x: 800, y: 400},
+		{x: 200, y: 400}, {x: 730, y: 400}, {x: 200, y: 530}, {x: 730, y: 530}
+	];
+	for(var i in b) entities.push(new Box(ctx, b[i].x, b[i].y, 60, 60));
+		
+	for(var x = 1; x < 7; x++) {
+		entities.push(new Box(ctx, 100 + x * 100, 130, 90, 60));
+		entities.push(new Box(ctx, 100 + x * 100, 800, 90, 60));
+		if(x !== 3 && x !== 4) {	
+			entities.push(new Box(ctx, 130, 100 + x * 100, 60, 90));
+			entities.push(new Box(ctx, 800, 100 + x * 100, 60, 90));
+		}
+	}
+
 
 	// Render
 	this.draw = function() {
@@ -138,6 +160,7 @@ function Game(ctx) {
  			x: self.camera.clientPos.x - self.ctx.canvas.width / 2 + player.width / 2,
  			y: self.camera.clientPos.y - self.ctx.canvas.height / 2 + player.height / 2,
 		}
+
 
 		for(var i in entities) {
 

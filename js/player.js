@@ -63,11 +63,13 @@ function Player(ctx, x, y, width, height) {
 		var bfb = broadphaseBox(self, finalVel);
 
 		// Find a collision that occurs first
+		debugCtx.clearRect(0, 0, debugCan.width, debugCan.height);
 		for(var i in entityList) {
 			if(!AABBCheck(bfb, entityList[i])) {
 				continue;
 			}
 			var ecol = SweptAABB(self, entityList[i], finalVel);
+
 			if(firstCol.entryTime > ecol.entryTime) {
 				firstCol = ecol;
 				firstCol.id = i;
@@ -75,8 +77,9 @@ function Player(ctx, x, y, width, height) {
 		}
 
 		// If any collision occured
-		if(firstCol.entryTime != Infinity)
+		if(firstCol.entryTime != Infinity) {
 			finalVel = finalVel.multiply(firstCol.entryTime);
+		}
 
 		// New position and dot product vector for sliding
 		var x = self.pos.x + finalVel.x;
@@ -106,13 +109,17 @@ function Player(ctx, x, y, width, height) {
 					continue;
 				}
 				var scol = SweptAABB(temp, entityList[i], nv);
-				if(scol.entryTime < 1.0 && ((firstCol.normalx && scol.normaly) || (firstCol.normaly && scol.normalx)) ){
+				if(scol.entryTime < 1.0 && ((firstCol.normalx != scol.normalx) || (firstCol.normaly != scol.normaly)) ) {
+					var tempV = nv.multiply(scol.entryTime);
+					var secTemp = new Box(self.ctx, temp.pos.x + tempV.x, temp.pos.y + tempV.y, self.width, self.height);
 					if(scol.entryTime < secondCol.entryTime) {
 						secondCol = scol;
 						scol.id = i;
 					}
 				}
 			}
+
+
 
 			// Calcute final velocity
 			if(firstCol.entryTime != Infinity) {

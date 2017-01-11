@@ -15,3 +15,4 @@ It's soon to be a top down shooter
 	- Inaccuracy and spread (to be considered)
 - Advanced controls (dashing etc.)
 - Advance the whole thing to multiplayer
+	- Procedurally generated maps
