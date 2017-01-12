@@ -141,9 +141,9 @@ function Player(ctx, x, y, width, height) {
 		self.pos = npos;
 
 		// Don't calcute negligible forces
-		if(self.vel.length() < MINVEL)
+		if(self.vel.length() < MIN_VEL)
 			self.vel = new Vector(0, 0);
 
-		self.vel = self.vel.limit(MAXVEL);
+		self.vel = self.vel.limit(MAX_VEL);
 	}
 }

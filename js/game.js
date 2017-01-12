@@ -8,16 +8,19 @@
 
 // Min / max velocity
 // Minimum velocity exists to prevent calculation of negligible forces
-const MINVEL = 2;
-const MAXVEL = 500;
+const MIN_VEL = 2;
+const MAX_VEL = 500;
 // Friction (should be less than acceleration)
 const FRICTION = 3000;
 // Acceleration
 const ACCEL = 8000;
 // Used for shiftng the camera depending on mouse position
-const MOUSEREACH = 150;
+const MOUSE_REACH = 150;
 // "Smoothness" of camera
-const CAMERALERP = 0.3;
+const CAMERA_LERP = 0.3;
+// Player dimensions
+const PLAYER_WIDTH = 39.5;
+const PLAYER_HEIGHT = 39.5;
 
 function Game(ctx) {
 	var self = this;
@@ -109,20 +112,21 @@ function Game(ctx) {
 		// Player position
 		var destPos = new Vector(player.pos.x, player.pos.y);
 		// self.camera.pos = destPos;
-		self.camera.pos = self.camera.pos.lerp(destPos, CAMERALERP);
+		self.camera.pos = self.camera.pos.lerp(destPos, CAMERA_LERP);
 
 		// Mouse position
-		var x = Util.map(0, self.ctx.canvas.width, -MOUSEREACH, MOUSEREACH, self.mouse.pos.x);
-		var y = Util.map(0, self.ctx.canvas.height, -MOUSEREACH, MOUSEREACH, self.mouse.pos.y);
+		var x = Util.map(0, self.ctx.canvas.width, -MOUSE_REACH, MOUSE_REACH, self.mouse.pos.x);
+		var y = Util.map(0, self.ctx.canvas.height, -MOUSE_REACH, MOUSE_REACH, self.mouse.pos.y);
 		self.camera.clientPos = self.camera.pos.add(new Vector(x, y));
 	};
 
 	// Time and framerate
 	var lastTime = Date.now();
 	var deltaTime;
+	var fps, frameCount = 0, frameTimer = 0;
 
-	// Reason for 39.9 in ../NOTES.md
-	var player = new Player(ctx, 488, 488, 39.9, 39.9);
+	// Reason for 39.5 in ../NOTES.md
+	var player = new Player(ctx, 488, 488, PLAYER_WIDTH, PLAYER_HEIGHT);
 
 	var entities = [];
 	// Test entities
@@ -181,8 +185,18 @@ function Game(ctx) {
 
 	// Main loop
 	this.tick = function() {
-		deltaTime = Date.now() - lastTime;
+		var now = Date.now();
+		deltaTime = now - lastTime;
 		lastTime += deltaTime;
+
+		frameCount++;
+		frameTimer += deltaTime;
+		if(frameTimer > 500) {
+			fps = Math.floor(frameCount / frameTimer * 1000);
+			frameTimer = 0;
+			frameCount = 0;
+		}
+
 
 		self.update(deltaTime);
 		self.draw();
@@ -201,13 +215,23 @@ function Game(ctx) {
 	function debugText(ctx, clear) {
 		if(clear)
 			ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
+
+		ctx.beginPath();
+		ctx.rect(0, 0, 200, ctx.canvas.height);
+		ctx.fillStyle = 'rgba(0, 0, 0, 0.3)';
+		ctx.fill();
+		ctx.closePath();
+
 		ctx.font = '20px Arial';
 		ctx.textAlign = 'left';
 		ctx.fillStyle = '#fff';
+		// Framerate
+		ctx.fillText('f: ' + (fps || 0), 10, 30);
+		// Position
+		ctx.fillText('x: ' + Math.round(player.pos.x), 10, 60);
+		ctx.fillText('y: ' + Math.round(player.pos.y), 10, 90);
 		// Speed
-		ctx.fillText('x: ' + Math.round(player.pos.x), 10, 30);
-		ctx.fillText('y: ' + Math.round(player.pos.y), 10, 60);
-		ctx.fillText('v: ' + Math.abs(Math.round(player.vel.length())), 10, 90);
+		ctx.fillText('v: ' + Math.abs(Math.round(player.vel.length())), 10, 120);
 
 		ctx.textAlign = 'center';
 		debugKey(ctx, player.moving_up,    'W', 130, 45);
@@ -216,8 +240,6 @@ function Game(ctx) {
 		debugKey(ctx, player.moving_right, 'D', 160, 75);
 
 		// debugCamera(ctx);
-
-		debugFPS(ctx);
 	}
 
 	function debugKey(ctx, flag, text, x, y) {
@@ -231,7 +253,7 @@ function Game(ctx) {
 	function debugCamera(ctx) {
 		// Mouse reach (I still think it's twice too big)
 		ctx.beginPath();
-		ctx.rect(ctx.canvas.width / 2 - MOUSEREACH, ctx.canvas.height / 2  - MOUSEREACH, 2 * MOUSEREACH, 2 * MOUSEREACH);
+		ctx.rect(ctx.canvas.width / 2 - MOUSE_REACH, ctx.canvas.height / 2  - MOUSE_REACH, 2 * MOUSE_REACH, 2 * MOUSE_REACH);
 		ctx.strokeStyle = 'rgba(255, 120, 120, 0.8)';
 		ctx.stroke();
 		ctx.closePath();
@@ -243,7 +265,4 @@ function Game(ctx) {
 		ctx.closePath();
 	}
 
-	function debugFPS(ctx) {
-
-	}
 }
