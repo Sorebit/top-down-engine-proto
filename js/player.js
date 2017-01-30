@@ -29,6 +29,7 @@ function Player(ctx, x, y, width, height) {
 	this.update = function(dt, entityList) {
 		// Force to apply (should not be greater when moving diagonally)
 		var accelerationForce = new Vector(0, 0);
+
 		if(self.moving_up && !self.moving_down)
 			accelerationForce = accelerationForce.add(new Vector(0, -ACCEL));
 		if(self.moving_down && !self.moving_up)
@@ -43,7 +44,8 @@ function Player(ctx, x, y, width, height) {
 		self.addForce(accelerationForce);
 
 		// Deceleration from friction
-		var frictionForce = self.vel.scale(FRICTION).multiply(dt / 1000);
+		var frictionFactor = (self.colliding) ? FRICTION_COLLIDING : FRICTION;
+		var frictionForce = self.vel.scale(frictionFactor).multiply(dt / 1000);
 		if(self.vel.length() > frictionForce.length())
 			self.vel = self.vel.sub(frictionForce);
 		else
@@ -78,7 +80,10 @@ function Player(ctx, x, y, width, height) {
 
 		// If any collision occured
 		if(firstCol.entryTime != Infinity) {
+			self.colliding = true;
 			finalVel = finalVel.multiply(firstCol.entryTime);
+		} else {
+			self.colliding = false;
 		}
 
 		// New position and dot product vector for sliding
@@ -118,7 +123,6 @@ function Player(ctx, x, y, width, height) {
 					}
 				}
 			}
-
 
 
 			// Calcute final velocity

@@ -11,13 +11,16 @@
 const MIN_VEL = 2;
 const MAX_VEL = 500;
 // Friction (should be less than acceleration)
+// const FRICTION = 300; // ice-type floor
+// const FRICTION_COLLIDING = 800; // ice-type floor
 const FRICTION = 3000;
+const FRICTION_COLLIDING = 6000;
 // Acceleration
 const ACCEL = 8000;
 // Used for shiftng the camera depending on mouse position
 const MOUSE_REACH = 150;
 // "Smoothness" of camera
-const CAMERA_LERP = 0.3;
+const CAMERA_LERP = 0.5;
 // Player dimensions
 const PLAYER_WIDTH = 39.5;
 const PLAYER_HEIGHT = 39.5;

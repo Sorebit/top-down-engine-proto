@@ -1,5 +1,5 @@
 // Rectangular entity
-function Box(ctx, x, y, width, height) {
+function Box(ctx, x, y, width, height, color) {
 	this.ctx = ctx;
 
 	this.pos = {
@@ -8,6 +8,10 @@ function Box(ctx, x, y, width, height) {
 	};
 	this.width  = width;
 	this.height = height;
+
+	this.color = color || 'rgba(180, 180, 180, 0.7)';
+
+	this.colliding = false;
 
 	var self = this;
 
@@ -22,7 +26,7 @@ function Box(ctx, x, y, width, height) {
 
 		self.ctx.beginPath();
 		self.ctx.rect(x, y, self.width, self.height);
-		self.ctx.fillStyle = 'rgba(180, 180, 180, 0.7)';
+		self.ctx.fillStyle = self.color;
 		self.ctx.fill();
 		self.ctx.closePath();
 	};
