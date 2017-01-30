@@ -1,6 +1,9 @@
 # Top down engine prototype
 It's soon to be a top down shooter
 
+### Preview
+![preview](/assets/preview.png)
+
 ### Features
 - Basic controls and physics (acceleration, velocity, friction)
 - Collision (static and moving rectangles)
