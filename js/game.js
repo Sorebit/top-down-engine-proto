@@ -173,13 +173,6 @@ function Game(ctx) {
 		}
 	}
 
-	addEntity(new Box(405, 380, 20, 20, ctx));
-	addEntity(new Box(439, 380, 20, 20, ctx));
-	addEntity(new Box(450, 440, 20, 20, ctx));
-	addEntity(new Box(450, 470, 20, 20, ctx));
-	addEntity(new Box(450, 410, 20, 20, ctx));
-
-
 	// Render
 	this.draw = function() {
 		self.ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
