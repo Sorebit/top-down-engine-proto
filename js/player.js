@@ -1,13 +1,14 @@
 'use strict';
 
-function Player(ctx, x, y, width, height) {
-	this.ctx = ctx;
+function Player(x, y, width, height, ctx) {
+	this.ctx = ctx || null;
+
 	this.pos = new Vector(x, y);
 	this.width  = width;
 	this.height = height;
 
 	this.vel = new Vector(0, 0);
-
+	
 	var self = this;
 
 	// Apply force (Vector(x, y))
@@ -66,10 +67,12 @@ function Player(ctx, x, y, width, height) {
 
 		// Find a collision that occurs first
 		debugCtx.clearRect(0, 0, debugCan.width, debugCan.height);
+
 		for(var i in entityList) {
 			if(!AABBCheck(bfb, entityList[i])) {
 				continue;
 			}
+
 			var ecol = SweptAABB(self, entityList[i], finalVel);
 
 			if(firstCol.entryTime > ecol.entryTime) {
@@ -95,7 +98,7 @@ function Player(ctx, x, y, width, height) {
 
 		// Second collision
 		if(firstCol.entryTime != Infinity && (firstCol.normalx || firstCol.normaly)) {
-			var temp = new Box(self.ctx, self.pos.x + finalVel.x, self.pos.y + finalVel.y, self.width, self.height);
+			var temp = new Box(self.pos.x + finalVel.x, self.pos.y + finalVel.y, self.width, self.height, self.ctx);
 			
 			// Broadphase box to not check objects you can't possibly collide at this frame 
 			var bfb = broadphaseBox(temp, nv);
@@ -116,7 +119,7 @@ function Player(ctx, x, y, width, height) {
 				var scol = SweptAABB(temp, entityList[i], nv);
 				if(scol.entryTime < 1.0 && ((firstCol.normalx != scol.normalx) || (firstCol.normaly != scol.normaly)) ) {
 					var tempV = nv.multiply(scol.entryTime);
-					var secTemp = new Box(self.ctx, temp.pos.x + tempV.x, temp.pos.y + tempV.y, self.width, self.height);
+					var secTemp = new Box(temp.pos.x + tempV.x, temp.pos.y + tempV.y, self.width, self.height, self.ctx);
 					if(scol.entryTime < secondCol.entryTime) {
 						secondCol = scol;
 						scol.id = i;

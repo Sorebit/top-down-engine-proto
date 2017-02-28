@@ -20,10 +20,16 @@ const ACCEL = 8000;
 // Used for shiftng the camera depending on mouse position
 const MOUSE_REACH = 150;
 // "Smoothness" of camera
-const CAMERA_LERP = 0.5;
+const CAMERA_LERP = 0.7;
 // Player dimensions
 const PLAYER_WIDTH = 39.5;
 const PLAYER_HEIGHT = 39.5;
+// Quadtree constants
+const MAX_OBJECTS = 4;
+const MAX_LEVELS = 10;
+// Map size
+const MAP_WIDTH = 1000;
+const MAP_HEIGHT = 1000;
 
 function Game(ctx) {
 	var self = this;
@@ -129,14 +135,21 @@ function Game(ctx) {
 	var fps, frameCount = 0, frameTimer = 0;
 
 	// Reason for 39.5 in ../NOTES.md
-	var player = new Player(ctx, 488, 488, PLAYER_WIDTH, PLAYER_HEIGHT);
+	var player = new Player((MAP_WIDTH - PLAYER_WIDTH) / 2, (MAP_HEIGHT - PLAYER_HEIGHT) / 2, PLAYER_WIDTH, PLAYER_HEIGHT, ctx);
+
+	var quadTree = new Quadtree(new Box(0, 0, MAP_WIDTH, MAP_HEIGHT));
+
+	function addEntity(e) {
+		entities.push(e);
+		quadTree.insert(e);
+	}
 
 	var entities = [];
 	// Test entities
 	for(var y = 0; y < 10; y++) {
 		for(var x = 0; x < 10; x++) {
 			if(x === 0 || y === 0 || x === 9 || y === 9) {
-				entities.push(new Box(ctx, x * 100, y * 100, 90, 90));
+				addEntity(new Box(x * 100, y * 100, 90, 90, ctx));
 			}
 		}
 	}
@@ -147,16 +160,24 @@ function Game(ctx) {
 		{x: 130, y: 530}, {x: 800, y: 530}, {x: 130, y: 400}, {x: 800, y: 400},
 		{x: 200, y: 400}, {x: 730, y: 400}, {x: 200, y: 530}, {x: 730, y: 530}
 	];
-	for(var i in b) entities.push(new Box(ctx, b[i].x, b[i].y, 60, 60));
+	for(var i in b) {
+		addEntity(new Box(b[i].x, b[i].y, 60, 60, ctx));
+	}
 		
 	for(var x = 1; x < 7; x++) {
-		entities.push(new Box(ctx, 100 + x * 100, 130, 90, 60));
-		entities.push(new Box(ctx, 100 + x * 100, 800, 90, 60));
+		addEntity(new Box(100 + x * 100, 130, 90, 60, ctx));
+		addEntity(new Box(100 + x * 100, 800, 90, 60, ctx));
 		if(x !== 3 && x !== 4) {	
-			entities.push(new Box(ctx, 130, 100 + x * 100, 60, 90));
-			entities.push(new Box(ctx, 800, 100 + x * 100, 60, 90));
+			addEntity(new Box(130, 100 + x * 100, 60, 90, ctx));
+			addEntity(new Box(800, 100 + x * 100, 60, 90, ctx));
 		}
 	}
+
+	addEntity(new Box(405, 380, 20, 20, ctx));
+	addEntity(new Box(439, 380, 20, 20, ctx));
+	addEntity(new Box(450, 440, 20, 20, ctx));
+	addEntity(new Box(450, 470, 20, 20, ctx));
+	addEntity(new Box(450, 410, 20, 20, ctx));
 
 
 	// Render
@@ -168,9 +189,7 @@ function Game(ctx) {
  			y: self.camera.clientPos.y - self.ctx.canvas.height / 2 + player.height / 2,
 		}
 
-
 		for(var i in entities) {
-
 			entities[i].draw(offset);
 		}
 
@@ -182,7 +201,16 @@ function Game(ctx) {
 
 	// Physics update
 	this.update = function(dt) {
-		player.update(dt, entities);
+		for(var i in entities) {
+			entities[i].check = false;
+		}
+		// var toCheck = quadTree.retrieve(broadphaseBox(player, player.vel.multiply(1.1)));
+		var toCheck = quadTree.retrieve(broadphaseBox(player, player.vel));
+		for(var i in toCheck) {
+			toCheck[i].check = true;
+		}
+
+		player.update(dt, toCheck);
 		self.camera.update(dt);
 	};
 
@@ -199,7 +227,6 @@ function Game(ctx) {
 			frameTimer = 0;
 			frameCount = 0;
 		}
-
 
 		self.update(deltaTime);
 		self.draw();
@@ -266,6 +293,16 @@ function Game(ctx) {
 		ctx.strokeStyle = 'rgba(255, 120, 120, 0.8)';
 		ctx.stroke();
 		ctx.closePath();
+	}
+
+	function debugTree(node, off) {
+		self.ctx.strokeStyle = 'rgba(127, 127, 127, 1.0)';
+		self.ctx.strokeRect(node.bounds.pos.x - off.x, node.bounds.pos.y - off.y, node.bounds.width, node.bounds.height);
+
+		if(node.nodes.length > 0) {
+			for(var i in node.nodes)
+				debugTree(node.nodes[i], off);
+		}
 	}
 
 }

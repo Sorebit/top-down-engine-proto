@@ -119,7 +119,7 @@ function AABB(b1, b2) {
 // to position after moving it by velocity vel
 function broadphaseBox(b, vel)
 {
-	var box = new Box(0.0, 0.0, 0.0, 0.0);
+	var box = new Box(null, 0.0, 0.0, 0.0, 0.0);
 
 	box.pos.x = vel.x > 0 ? b.pos.x : b.pos.x + vel.x;
 	box.pos.y = vel.y > 0 ? b.pos.y : b.pos.y + vel.y;
@@ -218,6 +218,7 @@ function SweptAABB(b1, b2, vel)
 
 /* Utility functions */
 var Util = {
+	// Map a value @val from range [a, b] to range [l, r]
 	map: function(a, b, l, r, val) {
 		if(b <= a || r <= l)
 			return null;
