@@ -124,8 +124,8 @@ function Game(ctx) {
 		self.camera.pos = self.camera.pos.lerp(destPos, CAMERA_LERP);
 
 		// Mouse position
-		var x = Util.map(0, self.ctx.canvas.width, -MOUSE_REACH, MOUSE_REACH, self.mouse.pos.x);
-		var y = Util.map(0, self.ctx.canvas.height, -MOUSE_REACH, MOUSE_REACH, self.mouse.pos.y);
+		var x = Util.map(self.mouse.pos.x, 0, self.ctx.canvas.width, -MOUSE_REACH, MOUSE_REACH);
+		var y = Util.map(self.mouse.pos.y, 0, self.ctx.canvas.height, -MOUSE_REACH, MOUSE_REACH);
 		self.camera.clientPos = self.camera.pos.add(new Vector(x, y));
 	};
 

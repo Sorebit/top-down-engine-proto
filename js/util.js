@@ -216,13 +216,26 @@ function SweptAABB(b1, b2, vel)
 	}
 }
 
+function pointInRect(pnt, rect) {
+	return (Util.inRange(pnt.pos.x, rect.pos.x, rect.pos.x + rect.width) && Util.inRange(pnt.pos.y, rect.pos.y, rect.pos.y + rect.height));
+}
+
 /* Utility functions */
 var Util = {
-	// Map a value @val from range [a, b] to range [l, r]
-	map: function(a, b, l, r, val) {
+	// Map a value @val from range [@a, @b] to range [@l, @r]
+	map: function(val, a, b, l, r) {
 		if(b <= a || r <= l)
 			return null;
 		return (val - a) * (r - l) / (b - a) + l;
 		
-	}
+	},
+	// Check if @x is in range [@a, @b]
+	inRange: function(x, a, b) {
+		return (x >= a && x <= b);
+	},
+
+	// Det for line @a -> @b and point @c
+	det: function(a, b, c) {
+		return (b.pos.x - a.pos.x) * (c.pos.y - a.pos.y) - (b.pos.y - a.pos.y) * (c.pos.x - a.pos.x);
+	} 
 }

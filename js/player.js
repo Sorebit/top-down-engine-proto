@@ -72,7 +72,7 @@ function Player(x, y, width, height, ctx) {
 			if(!AABBCheck(bfb, entityList[i])) {
 				continue;
 			}
-
+			
 			var ecol = SweptAABB(self, entityList[i], finalVel);
 
 			if(firstCol.entryTime > ecol.entryTime) {
